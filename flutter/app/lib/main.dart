@@ -3,6 +3,10 @@ import 'package:app/dashboard.dart';
 import 'package:app/task_list.dart';
 import 'package:app/settings.dart';
 
+/*
+  if you run into the error code=254
+  Try Debug instead of Run below.
+ */
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -14,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: const Color(0xFF1B5633),  // primary color
+          primary: const Color(0xFF1B5633), // primary color
           secondary: const Color(0xFFFFCE00), // secondary color
         ),
       ),
