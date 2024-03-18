@@ -3,12 +3,9 @@ import 'package:app/data/fetch_task_data.dart';
 import 'package:app/data/mock_data/task_mock_data.dart';
 import 'package:app/style/text_style.dart';
 
-class TaskDetail extends StatelessWidget {
-  // text style variables
-  final AppTextStyles textStyle = AppTextStyles();
-
+class TaskDetail extends StatefulWidget {
+  final AppTextStylestextStyle = AppTextStyles();
   final String taskId;
-  TasksDataProvider tasksProvider = TasksDataProvider(tasks: taskMockData);
 
   TaskDetail({
     Key? key,
@@ -16,171 +13,214 @@ class TaskDetail extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _TaskDetailState createState() => _TaskDetailState();
+}
+
+class _TaskDetailState extends State<TaskDetail>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  TasksDataProvider tasksProvider = TasksDataProvider(tasks: taskMockData);
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Get the specific task details from the provider based on its ID
+    final String taskId = widget.taskId;
     Map<String, dynamic> taskDetails = tasksProvider.getTaskById(taskId);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Task Detail'),
+        title: Text(taskDetails['title']),
+        // title: const Text('Task Detail'),
         backgroundColor: Theme.of(context).colorScheme.primary,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(
+              text: 'Details',
+            ),
+            Tab(
+              text: 'Comments',
+            ),
+          ],
+          indicatorColor: Theme.of(context).colorScheme.secondary,
+        ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              // Task ID
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: Text(
-                  'Task ID: $taskId',
-                ),
-              ),
-              // Task title
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 5, 20, 10),
-                child: Text(
-                  taskDetails['title'],
-                  style: AppTextStyles.detailTitle,
-                ),
-              ),
-              // show its status and tag separating with /
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 0, 10),
-                    child: Text(
-                      taskDetails['status'],
-                      style: AppTextStyles.coloredText(taskDetails['status']),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                    child: Text(
-                      ' / ${taskDetails['tag']}',
-                      style: AppTextStyles.detailItemTitle,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Leading content
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // Details //
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  // Left side: Location, Due date
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // task ID
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child: Text(
+                      'Task ID: $taskId',
+                    ),
+                  ),
+                  // task title
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 5, 20, 10),
+                    child: Text(
+                      taskDetails['title'],
+                      style: AppTextStyles.detailTitle,
+                    ),
+                  ),
+                  // task status and tag separated with /
+                  Row(
                     children: [
-                      // Task location
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 0, 10),
                         child: Text(
-                          'Location',
-                          style: AppTextStyles.detailHeading,
+                          taskDetails['status'],
+                          style:
+                              AppTextStyles.coloredText(taskDetails['status']),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                         child: Text(
-                          taskDetails['location'],
-                          style: AppTextStyles.detailItemTitle,
-                        ),
-                      ),
-                      // Task due date
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                        child: Text(
-                          'Due Date',
-                          style: AppTextStyles.detailHeading,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                        child: Text(
-                          taskDetails['dueDate'],
+                          ' / ${taskDetails['tag']}',
                           style: AppTextStyles.detailItemTitle,
                         ),
                       ),
                     ],
                   ),
 
-                  // Right side: Tools
-                  // To wrap longer text, we use a SizedBox to provide some right margin.
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 2.1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                          child: Text(
-                            'Tools',
-                            style: AppTextStyles.detailHeading,
+                  // leading content
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left Side: Location, Due Date
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // task location
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                            child: Text(
+                              'Location',
+                              style: AppTextStyles.detailHeading,
+                            ),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                            child: Text(
+                              taskDetails['location'],
+                              style: AppTextStyles.detailItemTitle,
+                            ),
+                          ),
+                          // task due date
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                            child: Text(
+                              'Due Date',
+                              style: AppTextStyles.detailHeading,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                            child: Text(
+                              taskDetails['dueDate'],
+                              style: AppTextStyles.detailItemTitle,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Right Side: Tools Required
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                              child: Text(
+                                'Tools Reqired',
+                                style: AppTextStyles.detailHeading,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 15, 5),
+                              child: taskDetails['toolsRequired'] == null ||
+                                      taskDetails['toolsRequired'].isEmpty
+                                  ? const Text('N/A',
+                                      style: AppTextStyles.detailItemTitle)
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: taskDetails['toolsRequired']
+                                          .map<Widget>(
+                                            (tool) => Text(
+                                              tool,
+                                              style:
+                                                  AppTextStyles.detailBodyText,
+                                            ),
+                                          )
+                                          .toList(),
+                                    ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 15, 5),
-                          child: taskDetails['toolsRequired'] == null ||
-                                  taskDetails['toolsRequired'].isEmpty
-                              ? const Text('N/A',
-                                  style: AppTextStyles.detailItemTitle)
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: taskDetails['toolsRequired']
-                                      .map<Widget>(
-                                        (tool) => Text(
-                                          tool,
-                                          style: AppTextStyles.detailBodyText,
-                                        ),
-                                      )
-                                      .toList(),
-                                ),
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+
+                  // member assigned
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
+                    child: Text(
+                      'Assigned to',
+                      style: AppTextStyles.detailHeading,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25, 5, 25, 5),
+                    child: Text(
+                      taskDetails['assignedTo'].join(', '),
+                      style: AppTextStyles.detailBodyText,
+                    ),
+                  ),
+                  // task description
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
+                    child: Text(
+                      'Description',
+                      style: AppTextStyles.detailHeading,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(25, 5, 25, 5),
+                    child: Text(
+                      taskDetails['description'],
+                      style: AppTextStyles.detailBodyText,
                     ),
                   ),
                 ],
               ),
-
-              // member assigned
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
-                child: Text(
-                  'Assigned to',
-                  style: AppTextStyles.detailHeading,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(25, 5, 25, 5),
-                child: Text(
-                  taskDetails['assignedTo'].join(', '),
-                  style: AppTextStyles.detailBodyText,
-                ),
-              ),
-
-              // Task description
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
-                child: Text(
-                  'Description',
-                  style: AppTextStyles.detailHeading,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(25, 5, 25, 5),
-                child: Text(
-                  taskDetails['description'],
-                  style: AppTextStyles.detailBodyText,
-                ),
-              ),
-              // TODO: Add comment feature
-            ],
+            ),
           ),
-        ),
+
+          // Comments //
+          const Text('Comment Feature is coming soon!'),
+        ],
       ),
     );
   }
