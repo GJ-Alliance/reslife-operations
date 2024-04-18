@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:app/network/dio_client.dart';
 import 'package:app/main.dart';
+import 'package:dio/dio.dart';
 
 class Settings extends StatelessWidget {
   final DioClient dioClient;
@@ -9,10 +10,8 @@ class Settings extends StatelessWidget {
       : dioClient = client ?? DioClient(),
         super(key: key);
 
-  // function handles the logout process
   void _logout(BuildContext context) {
-    DioClient().logout();
-    // Navigate to the login page
+    dioClient.logout();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const MyApp()),
@@ -30,15 +29,24 @@ class Settings extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           FutureBuilder(
-            future: dioClient.fetchData("/api/v1/student_staff?page=1"),
-            builder: (context, snapshot) {
+            future: dioClient.fetchStudentStaff(selfOnly: true),
+            builder: (context, AsyncSnapshot<Response<dynamic>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
+                return Center(child: Text(snapshot.error.toString()));
               } else {
-                Map<String, dynamic>? userData = snapshot.data?.data;
-                return _buildProfileCard(context, userData);
+                final response = snapshot.data?.data;
+                if (response is Map && response.containsKey('message')) {
+                  return Center(child: Text(response['message']));
+                }
+                if (response is Map && response.containsKey('results')) {
+                  final results = response['results'];
+                  if (results is List && results.isNotEmpty) {
+                    return _buildProfileCard(context, results[0]);
+                  }
+                }
+                return Center(child: Text('No user information found'));
               }
             },
           ),
@@ -64,7 +72,7 @@ class Settings extends StatelessWidget {
   }
 
   Widget _buildProfileCard(
-      BuildContext context, Map<String, dynamic>? userData) {
+      BuildContext context, Map<String, dynamic> userData) {
     const ImageProvider backgroundImage =
         AssetImage('assets/images/alt_image.png');
 
@@ -78,22 +86,22 @@ class Settings extends StatelessWidget {
             // user profile
             Card(
               child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundImage: backgroundImage,
-                ),
+                leading: const CircleAvatar(backgroundImage: backgroundImage),
                 title: Text(
-                  '${userData["results"]![0]["fullName"]}',
+                  '${userData["fullName"]}',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                subtitle: Text(
-                  '${userData["results"]![0]["role"]}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Email: ${userData["email"]}'),
+                    Text('Phone: ${userData["phone"]}'),
+                    Text('Role: ${userData["role"]}'),
+                    Text('Gender: ${userData["gender"]}'),
+                  ],
                 ),
                 contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
                 isThreeLine: true,
@@ -131,9 +139,7 @@ class Settings extends StatelessWidget {
             ),
           ],
         ),
-      );
-    } else {
-      return const SizedBox(); // or an appropriate error message
-    }
+      ),
+    );
   }
 }

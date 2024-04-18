@@ -1,9 +1,7 @@
 import 'package:app/network/dio_client.dart';
+import 'package:app/widgets/first_login.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:app/main.dart';
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 /* 
   For debug
@@ -53,10 +51,20 @@ class _LoginState extends State<Login> {
       );
 
       if (response.statusCode == 200) {
+        // If response contains newPasswordRequired, retrieve response.session and show first login modal (modal should have access to session)
+        if (response.data['newPasswordRequired'] == true) {
+          FirstLogin(
+              context, response.data['session'], _usernameController.text);
+          return;
+        }
+
         setState(() {
           errorMessage = null;
         });
         _navigateToHome();
+
+        // TODO: check if the attempt is first time, and if it is, show first login modal
+        // _showFirstLoginModal();
       } else {
         setState(() {
           errorMessage = response.data['message'] ?? 'Invalid request.';
@@ -114,11 +122,12 @@ class _LoginState extends State<Login> {
                   color: Colors.red,
                 ),
               ),
-              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _attemptLogin,
                 child: const Text('Login'),
               ),
+              // TODO: this is just for check if the first login method works
+              //////////////////////////////////////////////
             ],
           ),
         ),
