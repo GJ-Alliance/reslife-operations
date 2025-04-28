@@ -1,3 +1,15 @@
+<table>
+  <tr>
+    <td valign="top"><img src="https://github.com/user-attachments/assets/224b0270-98f9-44a4-b6a1-0629c80c2b2e" alt="image 1" width="529"></td>
+    <td valign="top"><img src="https://github.com/user-attachments/assets/c6b43c20-9853-4b2e-a173-4cadd0029fc6" alt="image 2" width="529"></td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="https://github.com/user-attachments/assets/301b421d-60f7-4ab9-84da-c15c2934e177" alt="image 3" width="529"></td>
+    <td valign="top"><img src="https://github.com/user-attachments/assets/e490a6c5-8568-498f-95e4-a5fdb1e63245" alt="image 4" width="234"></td>
+  </tr>
+</table>
+
+
 Chosen idea - **Residence Maintenance Management Mobile Application**
  Description - _Extend the existing desktop-only maintenance reporting tool for residence life work to a mobile platform. Streamline notifications and task assignment for employees on duty, including details such as campus dorm location and room number. Incorporate ML for inventory suggestions based on historical data and potential tool requirements._
 
