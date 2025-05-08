@@ -51,10 +51,15 @@ class Settings extends StatelessWidget {
             },
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            padding: const EdgeInsets.fromLTRB(30, 0, 30, 50),
             child: ElevatedButton(
               onPressed: () => _logout(context),
-              child: const Text('Logout', style: TextStyle(fontSize: 18)),
+              child: Text(
+                'Logout',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
@@ -71,32 +76,68 @@ class Settings extends StatelessWidget {
     const ImageProvider backgroundImage =
         AssetImage('assets/images/alt_image.png');
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Card(
-        child: ListTile(
-          leading: const CircleAvatar(backgroundImage: backgroundImage),
-          title: Text(
-            '${userData["fullName"]}',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Email: ${userData["email"]}'),
-              Text('Phone: ${userData["phone"]}'),
-              Text('Role: ${userData["role"]}'),
-              Text('Gender: ${userData["gender"]}'),
-            ],
-          ),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
-          isThreeLine: true,
-          trailing: IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              /* Navigate to the edit profile page code goes here */
-            },
-          ),
+    if (userData != null &&
+        userData.containsKey('results') &&
+        (userData['results'] as List).isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Column(
+          children: [
+            // user profile
+            Card(
+              child: ListTile(
+                leading: const CircleAvatar(backgroundImage: backgroundImage),
+                title: Text(
+                  '${userData["fullName"]}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Email: ${userData["email"]}'),
+                    Text('Phone: ${userData["phone"]}'),
+                    Text('Role: ${userData["role"]}'),
+                    Text('Gender: ${userData["gender"]}'),
+                  ],
+                ),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
+                isThreeLine: true,
+                trailing: IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    // Navigate to edit profile page
+                  },
+                ),
+              ),
+            ),
+
+            // shift preference
+            TextButton(
+              onPressed: () {
+                // TODO: implement functionality to transit to shift preference page
+              },
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Shift Preference',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  // icon
+                  Center(
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
